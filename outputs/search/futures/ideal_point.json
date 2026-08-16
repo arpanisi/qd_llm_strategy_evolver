@@ -1,0 +1,16 @@
+{
+  "n_seeds": 9,
+  "objective_names": [
+    "f1_neg_sharpe",
+    "f2_neg_sortino",
+    "f3_neg_total_return",
+    "f4_neg_mdd"
+  ],
+  "pop_target": 56,
+  "z_star": [
+    -1.2112520728730944,
+    -0.989855924877864,
+    -1.050713200000001,
+    0.0595796876670672
+  ]
+}

@@ -13,3 +13,5 @@ data/*
 outputs/*
 !outputs/.gitkeep
 !outputs/baselines/
+!outputs/search/
+!outputs/seeds/
