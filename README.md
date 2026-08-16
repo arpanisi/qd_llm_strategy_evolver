@@ -1,6 +1,6 @@
 # Quality-Diversity Evolution of Trading Strategies With an LLM Research Team
 
-![Quality-diversity strategy evolution architecture](docs/project-graphic.png)
+![Quality-diversity strategy evolution architecture](docs/project-overview.png)
 
 Strategy research is bottlenecked by a single researcher's throughput and by the tendency of search to collapse onto one familiar style. This project asks whether a genuinely diverse population of trading strategies can be discovered automatically — and whether preserving that diversity costs anything in quality. It builds an autonomous research loop in which a language model proposes a falsifiable hypothesis, turns it into a complete trading strategy, and evaluates the result against realistic trading costs. Every outcome is distilled into a reusable insight that conditions the next proposal, so search quality compounds across iterations instead of resetting.
 
