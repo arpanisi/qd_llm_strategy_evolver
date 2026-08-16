@@ -1,0 +1,11 @@
+zipline-reloaded>=3.0
+wrds>=3.1.2
+yfinance>=0.2.40
+pandas>=2.0
+numpy>=1.26
+scipy>=1.11
+pyarrow>=15.0
+PyYAML>=6.0
+python-dotenv>=1.0
+openai>=1.30
+pytest>=8.0

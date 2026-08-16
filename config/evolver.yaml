@@ -1,0 +1,92 @@
+# Locked runtime/universe/model/evolution parameters for qd_llm_strategy_evolver.
+# Every value here is fixed by coding-plan.md (Decisions Locked In / Coding Steps)
+# unless explicitly marked as a Tier override in run_tier*.py entrypoints.
+
+run:
+  seed: 42            # single run-level RNG root seed (reproducibility, required)
+  log_level: INFO
+
+tracks:
+  equities:
+    bundle_name: equities
+    calendar: XNYS
+    bars_per_year: 252
+    starting_cash: 1000000.0
+    n_names: 15
+    universe_date: 2015-01-01          # first trading day on or after this date
+    data_end: 2024-12-31
+    train: [2015-01-01, 2020-12-31]
+    validation: [2021-01-01, 2022-12-31]
+    test: [2023-01-01, 2024-12-31]
+    cost:
+      per_share_cost: 0.0075
+      min_trade_cost: 1.0
+      volume_limit: 0.025
+      price_impact: 0.1
+      short_margin: 0.5               # Reg-T initial margin on short notional
+      gross_leverage_cap: 2.0         # gross exposure / NAV cap
+  futures:
+    bundle_name: futures
+    calendar: us_futures
+    bars_per_year: 365
+    starting_cash: 2000000.0
+    instruments: [ES, NQ]
+    yfinance_tickers: [ES=F, NQ=F]
+    roll_flag_threshold: 0.08         # single-day |return| beyond this is flagged for review
+    point_value: {ES: 50.0, NQ: 20.0}
+    tick_size: 0.25                   # CME tick, both instruments
+    train: [2018-01-01, 2022-12-31]
+    validation: [2023-01-01, 2024-06-30]
+    test: [2024-07-01, 2025-12-31]
+    cost:
+      commission_per_contract: 2.5
+      slippage_ticks: 1
+      margin_fraction: 0.10           # flat 10%-of-notional margin requirement
+      gross_leverage_cap: 2.0
+
+evolution:
+  num_islands: 9                      # = taxonomy categories (8) + benchmark island
+  generations: 150                    # G, per island per path per track
+  candidates_per_island_per_gen: 8
+  migration_interval: 10              # M
+  curation_interval: 50               # K
+
+path_a:
+  alpha: 0.5                          # best-parent branch probability
+  n_best_cousins: 2
+  n_diverse_cousins: 3
+  n_random_cousins: 2
+  cousin_neighbor_sigma: 1.0          # Gaussian width for diverse-cousin bin perturbation
+  bitflips: 2                         # k, style-vector bit flips per diverse-cousin draw
+  resample_attempts: 10
+  bins_per_dim: 16                    # continuous feature-map dimensions
+  bin_headroom: 0.5                   # expand observed seed range by 50% each side
+  ir_near_tie: 0.02                   # Combined-Score near-tie threshold (IR units)
+  turnover_tiebreak: lower            # lower average Turnover wins a near-tie
+
+path_b:
+  pop_target: 56                      # P, per island
+  das_dennis_p: 5                     # divisions over M objectives
+  n_objectives: 4
+  nadir_floor: 1e-6                   # degenerate normalization denominator floor
+  distance_near_tie: 0.02             # reference-point distance near-tie threshold
+
+models:
+  openrouter_base_url: https://openrouter.ai/api/v1
+  # DEVIATION from the locked two-tier cost design (Coding Plan, "Decisions
+  # Locked In"): the implementation role is specified as "the closest current
+  # ~30B-parameter-class open-weight instruct model" to keep the high-volume
+  # Step 6 loop cheap. Empirically on the futures track, both tested ~30B-class
+  # candidates fail the real coder prompts: qwen/qwen3.6-35b-a3b (MoE, ~3B
+  # active params) returns empty completions at a high rate, and the dense
+  # qwen/qwen-2.5-coder-32b-instruct deterministically truncates to 31 chars on
+  # long prompts (parent+cousin history). deepseek/deepseek-v3.2 is reliable on
+  # the same prompts (full responses, no empties) but is a reasoning-class
+  # model, so this trades Step 6 cost for reliability. Recorded here so the
+  # deviation is explicit, not a silent config change.
+  research_model: deepseek/deepseek-v3.2
+  implementation_model: deepseek/deepseek-v3.2
+  evaluation_model: deepseek/deepseek-v3.2
+  max_refinement_attempts: 5          # Step 6 stage-3 cap
+  request_timeout_s: 120
+  max_retries: 3
