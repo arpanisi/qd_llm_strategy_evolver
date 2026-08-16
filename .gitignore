@@ -12,3 +12,4 @@ data/*
 
 outputs/*
 !outputs/.gitkeep
+!outputs/baselines/
